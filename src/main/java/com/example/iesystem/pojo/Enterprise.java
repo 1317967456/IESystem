@@ -3,6 +3,7 @@ package com.example.iesystem.pojo;
 public class Enterprise {
     private Integer enterprise_id;
     private String enterprise_name;
+    private String contact_person;
     private String address;
     private String phone_number;
     private String email;
@@ -22,6 +23,14 @@ public class Enterprise {
 
     public void setEnterprise_name(String enterprise_name) {
         this.enterprise_name = enterprise_name;
+    }
+
+    public String getContact_person() {
+        return contact_person;
+    }
+
+    public void setContact_person(String contact_person) {
+        this.contact_person = contact_person;
     }
 
     public String getAddress() {

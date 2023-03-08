@@ -3,13 +3,21 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.iesystem.dao.EnterpriseDao">
-    <!--<resultMap id="customermap" type="Customer">
-        <id property="customerId" column="id"/>
-        <result property="customerName" column="customername"/>
-        <result property="customerAddress" column="customeraddress"/>
-        <result property="customerTicket" column="customerticket"/>
-    </resultMap>-->
+
     <select id="getEnterpriseList" resultType="Enterprise">
         select  * from enterprises
     </select>
+
+    <select id="getEnterpriseListByName" resultType="Enterprise">
+        select * from enterprises where enterprise_name = #{enterprise_name}
+    </select>
+
+    <select id="getEnterpriseListById" resultType="Enterprise">
+        select * from enterprises where enterprise_id = #{enterprise_id}
+    </select>
+
+    <insert id="addEnterprise">
+        insert into enterprises(enterprise_name,contact_person,address,phone_number,email,business_type)
+        values(#{enterprise_name},#{contact_person},#{address},#{phone_number},#{email},#{business_type})
+    </insert>
 </mapper>

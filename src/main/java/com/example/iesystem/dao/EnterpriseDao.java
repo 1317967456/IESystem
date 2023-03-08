@@ -9,4 +9,10 @@ import java.util.List;
 public interface EnterpriseDao {
 
     List<Enterprise> getEnterpriseList();
+
+    Enterprise getEnterpriseListByName(String name);
+
+    Enterprise getEnterpriseListById(Long id);
+
+    void addEnterprise(Enterprise enterprise);
 }
