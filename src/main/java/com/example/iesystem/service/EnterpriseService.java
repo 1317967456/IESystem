@@ -12,4 +12,8 @@ public interface EnterpriseService {
     Enterprise getEnterpriseListById(Long id);
 
     void addEnterprise(Enterprise enterprise);
+
+    void deleteBatch(Integer[] ids);
+
+    void update(Enterprise enterprise);
 }

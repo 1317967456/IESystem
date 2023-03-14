@@ -20,4 +20,16 @@
         insert into enterprises(enterprise_name,contact_person,address,phone_number,email,business_type)
         values(#{enterprise_name},#{contact_person},#{address},#{phone_number},#{email},#{business_type})
     </insert>
+
+    <delete id="deleteBatch">
+        delete from enterprises where enterprise_id in
+        <foreach collection="ids" item="enterprise_id" open="(" close=")" separator=",">
+            #{enterprise_id}
+        </foreach>
+    </delete>
+
+    <update id="updateEnterprise">
+        update enterprises set enterprise_name = #{enterprise_name},contact_person = #{contact_person},address = #{address},phone_number = #{phone_number},email = #{email},business_type = #{business_type}
+        where enterprise_id = #{enterprise_id}
+    </update>
 </mapper>

@@ -32,4 +32,14 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     public void addEnterprise(Enterprise enterprise) {
         enterpriseDao.addEnterprise(enterprise);
     }
+
+    @Override
+    public void deleteBatch(Integer[] ids) {
+        enterpriseDao.deleteBatch(ids);
+    }
+
+    @Override
+    public void update(Enterprise enterprise) {
+        enterpriseDao.updateEnterprise(enterprise);
+    }
 }

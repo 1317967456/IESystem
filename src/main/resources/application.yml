@@ -7,6 +7,9 @@ server:
 
 #数据库
 spring:
+  #渲染视图期间，关闭可以执行数据库查询
+  jpa:
+    open-in-view: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     druid:
@@ -19,3 +22,4 @@ mybatis:
   mapper-locations: classpath:mappers/*.xml
   #mapper包名简称
   type-aliases-package: com.example.iesystem.pojo
+

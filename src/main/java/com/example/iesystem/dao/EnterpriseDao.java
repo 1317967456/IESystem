@@ -1,6 +1,7 @@
 package com.example.iesystem.dao;
 
 import com.example.iesystem.pojo.Enterprise;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public interface EnterpriseDao {
     Enterprise getEnterpriseListById(Long id);
 
     void addEnterprise(Enterprise enterprise);
+
+    void deleteBatch(@Param("ids") Integer[] ids);
+
+    void updateEnterprise(Enterprise enterprise);
 }
