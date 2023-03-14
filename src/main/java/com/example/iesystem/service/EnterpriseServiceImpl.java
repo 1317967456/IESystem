@@ -42,4 +42,9 @@ public class EnterpriseServiceImpl implements EnterpriseService {
     public void update(Enterprise enterprise) {
         enterpriseDao.updateEnterprise(enterprise);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        enterpriseDao.deleteEnterpriseById(id);
+    }
 }

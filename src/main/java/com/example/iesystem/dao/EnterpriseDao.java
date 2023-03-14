@@ -20,4 +20,6 @@ public interface EnterpriseDao {
     void deleteBatch(@Param("ids") Integer[] ids);
 
     void updateEnterprise(Enterprise enterprise);
+
+    void deleteEnterpriseById(Long id);
 }

@@ -51,6 +51,14 @@ public class EnterpriseController {
         enterpriseService.addEnterprise(enterprise);
     }
     /**
+     * 删除公司信息
+     */
+    @PostMapping("/delete/{id}")
+    @ResponseBody
+    public void deleteBatch(@PathVariable("id")Long id){
+        enterpriseService.deleteById(id);
+    }
+    /**
      * 批量删除公司信息
      */
     @PostMapping("/deleteBatch")

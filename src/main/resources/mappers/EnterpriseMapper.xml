@@ -21,6 +21,11 @@
         values(#{enterprise_name},#{contact_person},#{address},#{phone_number},#{email},#{business_type})
     </insert>
 
+    <delete id="deleteEnterpriseById">
+        delete from enterprises where enterprise_id = #{enterprise_id}
+    </delete>
+
+
     <delete id="deleteBatch">
         delete from enterprises where enterprise_id in
         <foreach collection="ids" item="enterprise_id" open="(" close=")" separator=",">

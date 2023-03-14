@@ -16,4 +16,6 @@ public interface EnterpriseService {
     void deleteBatch(Integer[] ids);
 
     void update(Enterprise enterprise);
+
+    void deleteById(Long id);
 }
