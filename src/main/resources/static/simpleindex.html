@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>公司信息管理</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h1>公司信息列表</h1>
+  <!-- 公司信息表格 -->
+  <table id="enterprise-table" class="table">
+    <thead>
+    <tr>
+      <th>公司编号</th>
+      <th>公司名称</th>
+      <th>公司代表人</th>
+      <th>公司地址</th>
+      <th>联系方式</th>
+      <th>电子邮件</th>
+      <th>经营范围</th>
+      <th>操作</th>
+      <th><input type="checkbox" id="selectAll">全选</th>
+      <th><button type="submit" id="deleteBatchBtn">批量删除</button></th>
+    </tr>
+    </thead>
+    <tbody>
+    <script>
+      $(document).ready(function() {
+        // 全选/取消全选
+        $("#selectAll").click(function() {
+          $(".select-row").prop("checked", $(this).prop("checked"));
+        });
+        $.ajax({
+          url: "/enterprise/list",
+          type: "GET",
+          dataType: "json",
+          success: function(data) {
+            var tableRows = "";
+            $.each(data, function(index, enterprise) {
+              tableRows += "<tr>";
+              tableRows += "<td>" + enterprise.enterprise_id + "</td>";
+              tableRows += "<td>" + enterprise.enterprise_name + "</td>";
+              tableRows += "<td>" + enterprise.contact_person + "</td>";
+              tableRows += "<td>" + enterprise.address + "</td>";
+              tableRows += "<td>" + enterprise.phone_number + "</td>";
+              tableRows += "<td>" + enterprise.email + "</td>";
+              tableRows += "<td>" + enterprise.business_type + "</td>";
+              tableRows += "<td>" +
+                      "<button class='btn btn-danger' onclick='deleteEnterprise(" + enterprise.enterprise_id + ")'>删除</button> " +
+                      "<button class='btn btn-primary edit-btn' data-id='" + enterprise.enterprise_id + "'>编辑</button>" +
+                      "</td>";
+              tableRows += "<td><input type='checkbox' class='select-row' data-id='" + enterprise.enterprise_id + "'></td>";
+              tableRows += "</tr>";
+            });
+            $("table tbody").html(tableRows);
+            $(".edit-btn").on("click", function() {
+              var enterpriseId = $(this).data("id");
+              var row = $(this).closest("tr");
+              var enterpriseName = row.find("td:nth-child(2)").text();
+              var contactPerson = row.find("td:nth-child(3)").text();
+              var address = row.find("td:nth-child(4)").text();
+              var phoneNumber = row.find("td:nth-child(5)").text();
+              var email = row.find("td:nth-child(6)").text();
+              var businessType = row.find("td:nth-child(7)").text();
+
+
+              $("#enterprise-name").val(enterpriseName);
+              $("#contact-person").val(contactPerson);
+              $("#address").val(address);
+              $("#phone-number").val(phoneNumber);
+              $("#email").val(email);
+              $("#business-type").val(businessType);
+
+              $("#edit-company-btn").show().data("id", enterpriseId);
+            });
+
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log("Error: " + textStatus + " - " + errorThrown);
+          }
+        });
+        //批量删除功能
+        $("#deleteBatchBtn").click(function () {
+          var ids = [];
+          $(".select-row:checked").each(function () {
+            ids.push($(this).data("id"));
+          });
+          if (ids.length === 0) {
+            alert("请至少选择一项");
+            return;
+          }
+          $.ajax({
+            url: "/enterprise/deleteBatch",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(ids),
+            success: function () {
+              alert("删除成功");
+              refreshTable();
+            },
+            error: function () {
+              alert("删除失败");
+            }
+          });
+        });
+        //添加功能
+        $('#add-company-btn').click(function(event) {
+          event.preventDefault(); // 阻止表单自动提交
+
+          // 得到表单数据
+          var enterprise_name = $('#enterprise-name').val();
+          var contact_person = $('#contact-person').val();
+          var address = $('#address').val();
+          var phone_number = $('#phone-number').val();
+          var email = $('#email').val();
+          var business_type = $('#business-type').val();
+
+          // 发送ajax请求
+          $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/enterprise/add",
+            data: JSON.stringify({
+              enterprise_name: enterprise_name,
+              contact_person: contact_person,
+              address: address,
+              phone_number: phone_number,
+              email: email,
+              business_type: business_type
+            }),
+            success: function() {
+              alert("添加公司成功");
+              // 添加成功后重新渲染界面
+              $('#add-company-form')[0].reset();
+              refreshTable()
+            },
+            error: function(xhr, status, error) {
+              alert("添加公司失败: " + error);
+            }
+          });
+        });
+
+        $('#edit-company-btn').click(function(event) {
+          event.preventDefault(); // 阻止表单自动提交
+
+          // 得到表单数据
+          var enterprise_id = $(this).data("id");
+          var enterprise_name = $('#enterprise-name').val();
+          var contact_person = $('#contact-person').val();
+          var address = $('#address').val();
+          var phone_number = $('#phone-number').val();
+          var email = $('#email').val();
+          var business_type = $('#business-type').val();
+
+          // 发送ajax请求
+          $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/enterprise/update",
+            data: JSON.stringify({
+              enterprise_id: enterprise_id,
+              enterprise_name: enterprise_name,
+              contact_person: contact_person,
+              address: address,
+              phone_number: phone_number,
+              email: email,
+              business_type: business_type
+            }),
+            success: function() {
+              alert("修改公司成功");
+              // 修改成功后重新渲染界面
+              $('#add-company-form')[0].reset();
+              refreshTable()
+            },
+            error: function(xhr, status, error) {
+              alert("修改公司失败: " + error);
+            }
+          });
+        });
+
+        function refreshTable() {
+          $.ajax({
+            url: "/enterprise/list",
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+              var tableRows = "";
+              $.each(data, function(index, enterprise) {
+                tableRows += "<tr>";
+                tableRows += "<td>" + enterprise.enterprise_id + "</td>";
+                tableRows += "<td>" + enterprise.enterprise_name + "</td>";
+                tableRows += "<td>" + enterprise.contact_person + "</td>";
+                tableRows += "<td>" + enterprise.address + "</td>";
+                tableRows += "<td>" + enterprise.phone_number + "</td>";
+                tableRows += "<td>" + enterprise.email + "</td>";
+                tableRows += "<td>" + enterprise.business_type + "</td>";
+                tableRows += "<td>" +
+                        "<button class='btn btn-danger' onclick='deleteEnterprise(" + enterprise.enterprise_id + ")'>删除</button> " +
+                        "<button class='btn btn-primary edit-btn' data-id='" + enterprise.enterprise_id + "'>编辑</button>" +
+                        "</td>";
+                tableRows += "<td><input type='checkbox' class='select-row' data-id='" + enterprise.enterprise_id + "'></td>";
+                tableRows += "</tr>";
+              });
+              $("table tbody").html(tableRows);
+              $(".edit-btn").on("click", function() {
+                var enterpriseId = $(this).data("id");
+                var row = $(this).closest("tr");
+                var enterpriseName = row.find("td:nth-child(2)").text();
+                var contactPerson = row.find("td:nth-child(3)").text();
+                var address = row.find("td:nth-child(4)").text();
+                var phoneNumber = row.find("td:nth-child(5)").text();
+                var email = row.find("td:nth-child(6)").text();
+                var businessType = row.find("td:nth-child(7)").text();
+
+
+                $("#enterprise-name").val(enterpriseName);
+                $("#contact-person").val(contactPerson);
+                $("#address").val(address);
+                $("#phone-number").val(phoneNumber);
+                $("#email").val(email);
+                $("#business-type").val(businessType);
+
+                $("#edit-company-btn").show().data("id", enterpriseId);
+              });
+
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            }
+          });
+        }
+        //单个删除公司信息
+        window.deleteEnterprise = function deleteEnterprise(id) {
+          $.ajax({
+            url: "/enterprise/delete/" + id,
+            type: "POST",
+            success: function () {
+              alert("删除成功");
+              refreshTable();
+            },
+            error: function () {
+              alert("删除失败");
+            }
+          });
+        }
+
+        //单个获取公司信息
+        window.getEnterpriseById = function getEnterpriseById(id) {
+          $.ajax({
+            url: "/enterprise/id/" + id,
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+              alert("获取成功");
+              var tableRows = "";
+              var enterprise = data;
+                tableRows += "<tr>";
+                tableRows += "<td>" + enterprise.enterprise_id + "</td>";
+                tableRows += "<td>" + enterprise.enterprise_name + "</td>";
+                tableRows += "<td>" + enterprise.contact_person + "</td>";
+                tableRows += "<td>" + enterprise.address + "</td>";
+                tableRows += "<td>" + enterprise.phone_number + "</td>";
+                tableRows += "<td>" + enterprise.email + "</td>";
+                tableRows += "<td>" + enterprise.business_type + "</td>";
+                tableRows += "<td>" +
+                        "<button class='btn btn-danger' onclick='deleteEnterprise(" + enterprise.enterprise_id + ")'>删除</button> " +
+                        "<button class='btn btn-primary edit-btn' data-id='" + enterprise.enterprise_id + "'>编辑</button>" +
+                        "</td>";
+                tableRows += "<td><input type='checkbox' class='select-row' data-id='" + enterprise.enterprise_id + "'></td>";
+                tableRows += "</tr>";
+
+              $("table tbody").html(tableRows);
+              $(".edit-btn").on("click", function() {
+                var enterpriseId = $(this).data("id");
+                var row = $(this).closest("tr");
+                var enterpriseName = row.find("td:nth-child(2)").text();
+                var contactPerson = row.find("td:nth-child(3)").text();
+                var address = row.find("td:nth-child(4)").text();
+                var phoneNumber = row.find("td:nth-child(5)").text();
+                var email = row.find("td:nth-child(6)").text();
+                var businessType = row.find("td:nth-child(7)").text();
+
+
+                $("#enterprise-name").val(enterpriseName);
+                $("#contact-person").val(contactPerson);
+                $("#address").val(address);
+                $("#phone-number").val(phoneNumber);
+                $("#email").val(email);
+                $("#business-type").val(businessType);
+
+                $("#edit-company-btn").show().data("id", enterpriseId);
+              });
+
+            },
+            error: function () {
+              alert("获取失败");
+            }
+          });
+        }
+
+      });
+    </script>
+
+
+    </tbody>
+  </table>
+</div>
+
+<div class="container">
+  <h2 class="text-center">添加/修改公司信息</h2>
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3 bg-light p-4">
+      <form id="add-company-form">
+        <div class="form-group">
+          <label for="enterprise-name">企业名称：</label>
+          <input type="text" class="form-control" id="enterprise-name" name="enterprise_name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="contact-person">联系人：</label>
+          <input type="text" class="form-control" id="contact-person" name="contact_person" required>
+        </div>
+
+        <div class="form-group">
+          <label for="address">地址：</label>
+          <input type="text" class="form-control" id="address" name="address" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone-number">联系电话：</label>
+          <input type="text" class="form-control" id="phone-number" name="phone_number" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">电子邮件：</label>
+          <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="business-type">业务类型：</label>
+          <input type="text" class="form-control" id="business-type" name="business_type" required>
+        </div>
+
+        <button type="button" class="btn btn-primary" id="add-company-btn">添加公司</button>
+        <button type="button" class="btn btn-primary" id="edit-company-btn">修改公司</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+<footer>
+  <p class="text-center">&copy; 2023 My Website. All rights reserved.</p>
+</footer>
